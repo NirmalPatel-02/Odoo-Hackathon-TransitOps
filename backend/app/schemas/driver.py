@@ -1,33 +1,36 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, field_validator
+from datetime import date
+from decimal import Decimal
 from typing import Optional
-from datetime import datetime, date
+from app.models.driver import DriverStatus
 
 class DriverBase(BaseModel):
-    name: str = Field(..., min_length=2, max_length=100)
-    license_number: str = Field(..., min_length=5, max_length=30)
-    license_category: str
-    license_expiry: date
-    contact_number: str
-    safety_score: float = Field(default=5.0, ge=0, le=10)
+    name: str = Field(..., min_length=2, max_length=255)
+    license_number: str = Field(..., min_length=3, max_length=100)
+    license_category: str = Field(..., min_length=1, max_length=50)
+    license_expiry_date: date
+    contact_number: str = Field(..., min_length=5, max_length=50)
+    safety_score: Decimal = Field(Decimal("100.00"), ge=0, le=100)
 
+    @field_validator("license_number")
+    @classmethod
+    def format_license(cls, v: str) -> str:
+        return v.strip().upper()
 
 class DriverCreate(DriverBase):
-    status: str = Field(default="Available", pattern="^(Available|On Trip|Off Duty|Suspended)$")
-
+    pass
 
 class DriverUpdate(BaseModel):
     name: Optional[str] = None
+    license_category: Optional[str] = None
+    license_expiry_date: Optional[date] = None
     contact_number: Optional[str] = None
-    license_expiry: Optional[date] = None
-    safety_score: Optional[float] = None
-    status: Optional[str] = None
-
+    safety_score: Optional[Decimal] = None
+    status: Optional[DriverStatus] = None
 
 class DriverResponse(DriverBase):
     id: int
-    status: str
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    status: DriverStatus
 
     class Config:
         from_attributes = True

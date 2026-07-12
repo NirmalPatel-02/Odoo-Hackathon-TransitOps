@@ -1,8 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float, Enum, Date
-from sqlalchemy.orm import relationship
-from ..core.database import Base
+from sqlalchemy import Column, Integer, String, Numeric, Enum, Date
 import enum
-from datetime import date
+from app.core.database import Base
 
 class DriverStatus(str, enum.Enum):
     AVAILABLE = "Available"
@@ -14,12 +12,15 @@ class Driver(Base):
     __tablename__ = "drivers"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(100), nullable=False)
-    license_number = Column(String(30), unique=True, nullable=False)
-    license_category = Column(String(20), nullable=False)
-    license_expiry = Column(Date, nullable=False)
-    contact_number = Column(String(20), nullable=False)
-    safety_score = Column(Float, default=5.0)
-    status = Column(Enum(DriverStatus), default=DriverStatus.AVAILABLE)
+    name = Column(String(255), nullable=False)
+    license_number = Column(String(100), unique=True, index=True, nullable=False)
+    license_category = Column(String(50), nullable=False)
+    license_expiry_date = Column(Date, nullable=False)
+    contact_number = Column(String(50), nullable=False)
+    safety_score = Column(Numeric(5, 2), default=100.00, nullable=False)
 
-    trips = relationship("Trip", back_populates="driver")
+    status = Column(
+        Enum(DriverStatus, values_callable=lambda obj: [e.value for e in obj]),
+        default=DriverStatus.AVAILABLE,
+        nullable=False
+    )
