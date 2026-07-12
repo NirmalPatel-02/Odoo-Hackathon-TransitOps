@@ -1,4 +1,4 @@
-# TransitOps — Smart Transport Operations Platform
+# TransitOps - Smart Transport Operations Platform
 
 TransitOps is a full-stack fleet and transport-operations platform built for the Odoo Hackathon. It brings fleet assets, drivers, trips, maintenance, operating costs, and performance reporting into one role-aware workspace.
 
@@ -299,4 +299,4 @@ curl -X POST http://localhost:8000/api/v1/auth/login \
 
 ---
 
-Built for the **Odoo Hackathon** — TransitOps Smart Transport Operations Platform.
+Built for the **Odoo Hackathon** - TransitOps Smart Transport Operations Platform.
