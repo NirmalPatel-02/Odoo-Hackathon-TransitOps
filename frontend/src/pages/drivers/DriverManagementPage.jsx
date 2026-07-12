@@ -5,50 +5,19 @@ import Modal from "../../components/common/Modal";
 import StatusBadge from "../../components/common/StatusBadge";
 import { useAuth } from "../../context/AuthContext";
 import { canEdit } from "../../constants/permissions";
+import { formatDate } from "../../utils/formatters";
+import { createDriver, listDrivers, updateDriver } from "../../api/endpoints/drivers";
 
 const DRIVER_STATUSES = ["Available", "On Trip", "Off Duty", "Suspended"];
 const DRIVER_LICENSE_CATEGORIES = ["A", "B", "C", "D", "E"];
 
-const MOCK_DRIVERS = [
-  {
-    id: 1,
-    name: "Asha Rao",
-    licenseNumber: "DL-2023001",
-    licenseCategory: "D",
-    licenseExpiryDate: "2027-06-15",
-    contactNumber: "+91 98765 43210",
-    safetyScore: 96,
-    status: "Available",
-  },
-  {
-    id: 2,
-    name: "Rahul Menon",
-    licenseNumber: "DL-2023002",
-    licenseCategory: "C",
-    licenseExpiryDate: "2026-11-10",
-    contactNumber: "+91 91234 56789",
-    safetyScore: 88,
-    status: "On Trip",
-  },
-  {
-    id: 3,
-    name: "Nikhil Das",
-    licenseNumber: "DL-2023003",
-    licenseCategory: "B",
-    licenseExpiryDate: "2028-01-19",
-    contactNumber: "+91 99887 66554",
-    safetyScore: 91,
-    status: "Off Duty",
-  },
-];
-
 const EMPTY_FORM = {
   name: "",
-  licenseNumber: "",
-  licenseCategory: "B",
-  licenseExpiryDate: "",
-  contactNumber: "",
-  safetyScore: "",
+  license_number: "",
+  license_category: "B",
+  license_expiry_date: "",
+  contact_number: "",
+  safety_score: "",
   status: "Available",
 };
 
@@ -66,9 +35,22 @@ export default function DriverManagementPage() {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const fetchDrivers = async () => {
+    setLoading(true);
+    try {
+      const { data } = await listDrivers();
+      setDrivers(data);
+    } catch (error) {
+      setFormError(error.response?.data?.detail || "Unable to load drivers.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setDrivers(MOCK_DRIVERS);
+    fetchDrivers();
   }, []);
 
   const filteredDrivers = useMemo(() => {
@@ -77,7 +59,7 @@ export default function DriverManagementPage() {
       const matchesSearch =
         !search.trim() ||
         driver.name.toLowerCase().includes(search.trim().toLowerCase()) ||
-        driver.licenseNumber.toLowerCase().includes(search.trim().toLowerCase());
+        driver.license_number.toLowerCase().includes(search.trim().toLowerCase());
 
       return matchesStatus && matchesSearch;
     });
@@ -94,59 +76,63 @@ export default function DriverManagementPage() {
     setEditingId(driver.id);
     setForm({
       name: driver.name,
-      licenseNumber: driver.licenseNumber,
-      licenseCategory: driver.licenseCategory,
-      licenseExpiryDate: driver.licenseExpiryDate,
-      contactNumber: driver.contactNumber,
-      safetyScore: driver.safetyScore,
+      license_number: driver.license_number,
+      license_category: driver.license_category,
+      license_expiry_date: driver.license_expiry_date,
+      contact_number: driver.contact_number,
+      safety_score: driver.safety_score,
       status: driver.status,
     });
     setFormError("");
     setModalOpen(true);
   };
 
-  const handleDelete = (driver) => {
-    setDrivers((prev) => prev.filter((item) => item.id !== driver.id));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError("");
 
-    if (!form.name.trim() || !form.licenseNumber.trim()) {
+    if (!form.name.trim() || !form.license_number.trim()) {
       setFormError("Name and license number are required.");
       return;
     }
 
-    const safetyScore = Number(form.safetyScore);
+    const safetyScore = Number(form.safety_score);
     if (!safetyScore || safetyScore < 0 || safetyScore > 100) {
       setFormError("Safety score must be between 0 and 100.");
       return;
     }
 
     const payload = {
-      ...form,
       name: form.name.trim(),
-      licenseNumber: form.licenseNumber.trim(),
-      safetyScore,
+      license_number: form.license_number.trim().toUpperCase(),
+      license_category: form.license_category,
+      license_expiry_date: form.license_expiry_date,
+      contact_number: form.contact_number,
+      safety_score: safetyScore,
+      status: form.status,
     };
 
-    if (editingId) {
-      setDrivers((prev) => prev.map((driver) => (driver.id === editingId ? { ...driver, ...payload } : driver)));
-    } else {
-      setDrivers((prev) => [...prev, { id: Date.now(), ...payload }]);
+    try {
+      if (editingId) {
+        const { data } = await updateDriver(editingId, payload);
+        setDrivers((prev) => prev.map((driver) => (driver.id === editingId ? data : driver)));
+      } else {
+        const { data } = await createDriver(payload);
+        setDrivers((prev) => [data, ...prev]);
+      }
+      setModalOpen(false);
+    } catch (error) {
+      setFormError(error.response?.data?.detail || "Unable to save driver.");
     }
-
-    setModalOpen(false);
   };
 
   const columns = [
     { key: "name", label: "Name" },
-    { key: "licenseNumber", label: "License No." },
-    { key: "licenseCategory", label: "License Category" },
-    { key: "licenseExpiryDate", label: "Expiry Date" },
-    { key: "contactNumber", label: "Contact" },
-    { key: "safetyScore", label: "Safety Score", render: (row) => `${row.safetyScore}/100` },
+    { key: "license_number", label: "License No." },
+    { key: "license_category", label: "License Category" },
+    { key: "license_expiry_date", label: "Expiry Date", render: (row) => formatDate(row.license_expiry_date) },
+    { key: "contact_number", label: "Contact" },
+    { key: "safety_score", label: "Safety Score", render: (row) => `${row.safety_score}/100` },
     { key: "status", label: "Status", render: (row) => <StatusBadge status={row.status} /> },
     ...(editable
       ? [
@@ -157,9 +143,6 @@ export default function DriverManagementPage() {
               <div className="flex gap-3 text-xs">
                 <button type="button" onClick={() => openEditModal(row)} className="text-sky-400 hover:text-sky-300">
                   Edit
-                </button>
-                <button type="button" onClick={() => handleDelete(row)} className="text-rose-400 hover:text-rose-300">
-                  Delete
                 </button>
               </div>
             ),
@@ -172,45 +155,23 @@ export default function DriverManagementPage() {
     <>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <FilterSelect
-            value={statusFilter}
-            onChange={setStatusFilter}
-            prefixLabel="Status"
-            options={[
-              { value: "All", label: "All" },
-              ...DRIVER_STATUSES.map((status) => ({ value: status, label: status })),
-            ]}
-          />
-          <input
-            type="text"
-            placeholder="Search by name or license..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="rounded-md border border-slate-800 bg-[#101318] px-3 py-2 text-sm text-slate-300 placeholder:text-slate-600 focus:border-amber-600/60 focus:outline-none"
-          />
+          <FilterSelect value={statusFilter} onChange={setStatusFilter} prefixLabel="Status" options={[{ value: "All", label: "All" }, ...DRIVER_STATUSES.map((status) => ({ value: status, label: status }))]} />
+          <input type="text" placeholder="Search by name or license..." value={search} onChange={(e) => setSearch(e.target.value)} className="rounded-md border border-slate-800 bg-[#101318] px-3 py-2 text-sm text-slate-300 placeholder:text-slate-600 focus:border-amber-600/60 focus:outline-none" />
         </div>
 
         {editable && (
-          <button
-            type="button"
-            onClick={openAddModal}
-            className="rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-amber-500"
-          >
+          <button type="button" onClick={openAddModal} className="rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-amber-500">
             + Add Driver
           </button>
         )}
       </div>
 
-      <DataTable columns={columns} rows={filteredDrivers} emptyMessage="No drivers match these filters." />
+      {loading ? <p className="text-sm text-slate-500">Loading drivers…</p> : <DataTable columns={columns} rows={filteredDrivers} emptyMessage="No drivers match these filters." />}
 
       {modalOpen && (
         <Modal title={editingId ? "Edit Driver" : "Add Driver"} onClose={() => setModalOpen(false)}>
           <form onSubmit={handleSubmit} className="space-y-3">
-            {formError && (
-              <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-400">
-                {formError}
-              </p>
-            )}
+            {formError && <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-400">{formError}</p>}
 
             <div>
               <label className="mb-1 block text-xs text-slate-500">Driver Name</label>
@@ -220,16 +181,12 @@ export default function DriverManagementPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="mb-1 block text-xs text-slate-500">License Number</label>
-                <input className={fieldClasses} value={form.licenseNumber} onChange={(e) => setForm({ ...form, licenseNumber: e.target.value })} />
+                <input className={fieldClasses} value={form.license_number} onChange={(e) => setForm({ ...form, license_number: e.target.value })} />
               </div>
               <div>
                 <label className="mb-1 block text-xs text-slate-500">License Category</label>
-                <select className={fieldClasses} value={form.licenseCategory} onChange={(e) => setForm({ ...form, licenseCategory: e.target.value })}>
-                  {DRIVER_LICENSE_CATEGORIES.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
+                <select className={fieldClasses} value={form.license_category} onChange={(e) => setForm({ ...form, license_category: e.target.value })}>
+                  {DRIVER_LICENSE_CATEGORIES.map((category) => <option key={category} value={category}>{category}</option>)}
                 </select>
               </div>
             </div>
@@ -237,27 +194,23 @@ export default function DriverManagementPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="mb-1 block text-xs text-slate-500">License Expiry Date</label>
-                <input type="date" className={fieldClasses} value={form.licenseExpiryDate} onChange={(e) => setForm({ ...form, licenseExpiryDate: e.target.value })} />
+                <input type="date" className={fieldClasses} value={form.license_expiry_date} onChange={(e) => setForm({ ...form, license_expiry_date: e.target.value })} />
               </div>
               <div>
                 <label className="mb-1 block text-xs text-slate-500">Contact Number</label>
-                <input className={fieldClasses} value={form.contactNumber} onChange={(e) => setForm({ ...form, contactNumber: e.target.value })} />
+                <input className={fieldClasses} value={form.contact_number} onChange={(e) => setForm({ ...form, contact_number: e.target.value })} />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="mb-1 block text-xs text-slate-500">Safety Score</label>
-                <input type="number" min="0" max="100" className={fieldClasses} value={form.safetyScore} onChange={(e) => setForm({ ...form, safetyScore: e.target.value })} />
+                <input type="number" min="0" max="100" className={fieldClasses} value={form.safety_score} onChange={(e) => setForm({ ...form, safety_score: e.target.value })} />
               </div>
               <div>
                 <label className="mb-1 block text-xs text-slate-500">Status</label>
                 <select className={fieldClasses} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-                  {DRIVER_STATUSES.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
+                  {DRIVER_STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
                 </select>
               </div>
             </div>

@@ -7,6 +7,9 @@ import DashboardLayout from '../components/layouts/DashboardLayout';
 import DashboardPage from '../pages/auth/DashboardPage';
 import VehicleRegistryPage from '../pages/fleet/VehicleRegistryPage';
 import DriverManagementPage from '../pages/drivers/DriverManagementPage';
+import TripManagementPage from '../pages/trips/TripManagementPage';
+import MaintenancePage from '../pages/maintenance/MaintenancePage';
+import FuelExpensePage from '../pages/expenses/FuelExpensePage';
 
 // Each future page slots in the same way: add the import above, then a
 // <Route> below - wrapped in <ProtectedRoute resource="..."> if it should
@@ -30,16 +33,19 @@ export default function AppRoutes() {
             <Route path="/drivers" element={<DriverManagementPage />} />
           </Route>
 
-          {/*
           <Route element={<ProtectedRoute resource="trips" />}>
-            <Route path="/trips" element={<TripDispatcherPage />} />
+            <Route path="/trips" element={<TripManagementPage />} />
           </Route>
+
           <Route element={<ProtectedRoute resource="maintenance" />}>
             <Route path="/maintenance" element={<MaintenancePage />} />
           </Route>
+
           <Route element={<ProtectedRoute resource="fuelExpenses" />}>
-            <Route path="/fuel-expenses" element={<FuelExpensesPage />} />
+            <Route path="/fuel-expenses" element={<FuelExpensePage />} />
           </Route>
+
+          {/*
           <Route element={<ProtectedRoute resource="analytics" />}>
             <Route path="/analytics" element={<AnalyticsPage />} />
           </Route>
