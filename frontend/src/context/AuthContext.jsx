@@ -54,6 +54,9 @@ export function AuthProvider({ children }) {
     setUser(null);
     setToken(null);
     window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
+    if (typeof window !== "undefined") {
+      window.location.assign("/login");
+    }
   };
 
   const value = {
