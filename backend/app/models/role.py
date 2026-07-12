@@ -6,6 +6,7 @@ class Role(Base):
     __tablename__ = "roles"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50), unique=True, nullable=False)
+    name = Column(String(50), unique=True, nullable=False)   # e.g. "Fleet Manager", "Driver"
 
-    users = relationship("User", back_populates="role")
+    # Relationship
+    users = relationship("User", back_populates="role", lazy="selectin")
