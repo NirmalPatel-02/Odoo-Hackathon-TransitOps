@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Register() {
     const navigate = useNavigate();
+    const { register } = useAuth();
 
     // Form Field States
     const [name, setName] = useState('');
@@ -25,7 +27,7 @@ export default function Register() {
     ];
 
     // Validation & Submission Handling
-    const handleRegisterSubmit = (e) => {
+    const handleRegisterSubmit = async (e) => {
         e.preventDefault();
         setFormError('');
         setShouldShake(false);
@@ -47,15 +49,25 @@ export default function Register() {
             triggerError('Please select your dispatch grid operational role.');
             return;
         }
+        console.log('Registering with:', { name, email, password, role_name: selectedRole });
+        console.log('selectedRole: ', selectedRole);
 
         setIsLoading(true);
-
-        // Simulate database lookup & asset mapping
-        setTimeout(() => {
-            setIsLoading(false);
-            // Navigate back to login view with successful registration trigger
+        try {
+            // NOTE: role_name is sent as the human-readable label (e.g.
+            // "Fleet Manager") to match constants/permissions.js. Confirm
+            // this against what your FastAPI backend actually expects —
+            // it may want the snake_case id (e.g. "fleet_manager") instead.
+            await register({ name, email, password, role_name: selectedRole });
             navigate('/login', { state: { registered: true, registeredEmail: email } });
-        }, 1500);
+        } catch (err) {
+            const message =
+                err.response?.data?.detail ||
+                'Could not create account. That email may already be registered.';
+            triggerError(message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const triggerError = (msg) => {
