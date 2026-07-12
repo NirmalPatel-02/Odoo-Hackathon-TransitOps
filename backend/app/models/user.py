@@ -6,12 +6,10 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String(100), unique=True, index=True, nullable=False)
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    name = Column(String(255), nullable=False)  # <-- Added name column
     hashed_password = Column(String(255), nullable=False)
-    full_name = Column(String(100), nullable=True)
     is_active = Column(Boolean, default=True)
 
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
-
-    # Relationship
-    role = relationship("Role", back_populates="users", lazy="selectin")
+    role = relationship("Role", back_populates="users")
