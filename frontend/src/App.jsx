@@ -1,17 +1,34 @@
-import viteLogo from './assets/vite.svg'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+// import { ToastContainer } from 'react-toastify'
+// import 'react-toastify/dist/ReactToastify.css'
+
 import './App.css'
+import Dashboard from './Features/Dashboard/Pages/Dashboard'
+import NotFoundPage from './Features/NotFoundPage'
 
 function App() {
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <h1 className='bg-blue-700'>Vite + React  </h1>
-      </div>
-    </div>
+ <BrowserRouter>
+    {/* <ScrollToTop /> */}
+    <Routes>
+      {/* <Route path="/" element={<Index />} /> */}
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="*" element={<NotFoundPage />} />
+      
+    </Routes>
+    {/* <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      /> */}
+  </BrowserRouter>
   )
 }
 
