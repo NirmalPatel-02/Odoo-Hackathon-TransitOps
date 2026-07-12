@@ -1,5 +1,3 @@
-// Generic table: columns = [{ key, label, render? }], rows = array of objects.
-// `render(row)` overrides plain `row[key]` rendering (e.g. status badges, actions).
 
 export default function DataTable({ columns, rows, emptyMessage = "No records found." }) {
   return (

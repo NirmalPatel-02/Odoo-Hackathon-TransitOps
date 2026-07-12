@@ -6,13 +6,11 @@ export default function Register() {
     const navigate = useNavigate();
     const { register } = useAuth();
 
-    // Form Field States
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [selectedRole, setSelectedRole] = useState(''); // Fleet Manager, Driver, Safety Officer, Financial Analyst
+    const [selectedRole, setSelectedRole] = useState('');
 
-    // Interactive UI States
     const [showPassword, setShowPassword] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -26,13 +24,11 @@ export default function Register() {
         { id: 'financial_analyst', label: 'Financial Analyst' }
     ];
 
-    // Validation & Submission Handling
     const handleRegisterSubmit = async (e) => {
         e.preventDefault();
         setFormError('');
         setShouldShake(false);
 
-        // Form Valdation Checks
         if (!name.trim()) {
             triggerError('Please enter your full legal name.');
             return;
@@ -54,10 +50,6 @@ export default function Register() {
 
         setIsLoading(true);
         try {
-            // NOTE: role_name is sent as the human-readable label (e.g.
-            // "Fleet Manager") to match constants/permissions.js. Confirm
-            // this against what your FastAPI backend actually expects —
-            // it may want the snake_case id (e.g. "fleet_manager") instead.
             await register({ name, email, password, role_name: selectedRole });
             navigate('/login', { state: { registered: true, registeredEmail: email } });
         } catch (err) {
@@ -84,7 +76,7 @@ export default function Register() {
     return (
         <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 sm:p-6 select-none font-sans">
 
-            {/* Dynamic inline styles for premium micro-animations (shake) */}
+
             <style>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
@@ -96,13 +88,13 @@ export default function Register() {
         }
       `}</style>
 
-            {/* Enterprise Form Register Card (White & Orange) */}
+
             <section className="bg-white border border-slate-200/85 rounded-2xl w-full max-w-md p-6 sm:p-8 md:p-10 shadow-xl shadow-slate-900/5 transition-all relative overflow-hidden flex flex-col justify-between min-h-[640px]">
 
-                {/* Top company brand logo block */}
+
                 <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
-                        {/* SVG Logo: route node + direction caret */}
+
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
@@ -113,7 +105,7 @@ export default function Register() {
                     </div>
                 </div>
 
-                {/* Core Form Card */}
+
                 <div className={`w-full ${shouldShake ? 'animate-shake' : ''}`}>
 
                     <div className="mb-6">
@@ -125,7 +117,7 @@ export default function Register() {
                         </p>
                     </div>
 
-                    {/* Form Error Notice Box */}
+
                     {formError && (
                         <div className="mb-5 bg-orange-50 border border-orange-200 rounded-xl p-4 flex items-start gap-3">
                             <div className="text-orange-600 mt-0.5">
@@ -141,7 +133,7 @@ export default function Register() {
 
                     <form onSubmit={handleRegisterSubmit} className="space-y-4">
 
-                        {/* Input 1: Name */}
+
                         <div>
                             <label htmlFor="name-input" className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1.5">
                                 Full Name
@@ -166,7 +158,7 @@ export default function Register() {
                             </div>
                         </div>
 
-                        {/* Input 2: Email */}
+
                         <div>
                             <label htmlFor="email-input" className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1.5">
                                 Corporate Email Address
@@ -191,7 +183,7 @@ export default function Register() {
                             </div>
                         </div>
 
-                        {/* Input 3: Password */}
+
                         <div>
                             <label htmlFor="password-input" className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1.5">
                                 Security Password
@@ -214,7 +206,7 @@ export default function Register() {
                                     </svg>
                                 </span>
 
-                                {/* Reveal password button */}
+
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
@@ -234,13 +226,13 @@ export default function Register() {
                             </div>
                         </div>
 
-                        {/* Input 4: Role Custom Dropdown */}
+
                         <div className="relative">
                             <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1.5">
                                 Assign System Role
                             </label>
 
-                            {/* Dropdown Button */}
+
                             <button
                                 type="button"
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -251,7 +243,7 @@ export default function Register() {
                                     {selectedRole || 'Choose your role...'}
                                 </span>
 
-                                {/* Arrow Caret */}
+
                                 <svg
                                     className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${isDropdownOpen ? 'transform rotate-180' : ''}`}
                                     fill="none"
@@ -263,10 +255,10 @@ export default function Register() {
                                 </svg>
                             </button>
 
-                            {/* Dropdown Panel Items */}
+
                             {isDropdownOpen && (
                                 <>
-                                    {/* Backdrop element to close the dropdown */}
+
                                     <div className="fixed inset-0 z-10" onClick={() => setIsDropdownOpen(false)} />
 
                                     <div className="absolute left-0 right-0 mt-2 z-20 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden py-1">
@@ -291,7 +283,7 @@ export default function Register() {
                             )}
                         </div>
 
-                        {/* Submit Button */}
+
                         <button
                             type="submit"
                             disabled={isLoading}
@@ -313,7 +305,7 @@ export default function Register() {
 
                 </div>
 
-                {/* Footer links to navigate to login */}
+
                 <div className="flex flex-col items-center gap-4 text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-5 mt-6">
                     <p>
                         Already registered?{' '}

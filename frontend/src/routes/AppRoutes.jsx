@@ -13,9 +13,6 @@ import FuelExpensePage from '../pages/expenses/FuelExpensePage';
 import AnalyticsPage from '../pages/analytics/AnalyticsPage';
 import SettingsPage from '../pages/settings/SettingsPage';
 
-// Each future page slots in the same way: add the import above, then a
-// <Route> below - wrapped in <ProtectedRoute resource="..."> if it should
-// be gated by the RBAC access table (constants/permissions.js).
 export default function AppRoutes() {
   return (
     <Routes>

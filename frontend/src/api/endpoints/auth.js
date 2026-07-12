@@ -1,6 +1,5 @@
 import axiosClient from "../axiosClient";
 
-// FastAPI's auth endpoint expects form-encoded credentials for OAuth2 login.
 export const loginRequest = (email, password) => {
   const formData = new URLSearchParams();
   formData.append("username", email);

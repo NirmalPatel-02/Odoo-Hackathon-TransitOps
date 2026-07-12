@@ -1,6 +1,3 @@
-// Sidebar nav config. Visibility is driven by the `resource` key against
-// constants/permissions.js (getAccess !== 'none'), not a hardcoded role list,
-// so it stays in sync with the access table automatically.
 
 export const NAV_ITEMS = [
   { label: "Dashboard", path: "/dashboard", resource: "dashboard" },

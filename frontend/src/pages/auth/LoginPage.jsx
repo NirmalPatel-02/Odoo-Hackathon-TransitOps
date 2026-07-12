@@ -7,8 +7,6 @@ export default function Login() {
     const location = useLocation();
     const { login } = useAuth();
 
-    // If we arrived here right after registering, prefill the email and
-    // show a confirmation banner.
     const justRegistered = location.state?.registered;
     const registeredEmail = location.state?.registeredEmail || '';
 
@@ -42,8 +40,6 @@ export default function Login() {
         setIsLoading(true);
         try {
             const user = await login(email, password);
-            // RBAC lands everyone on the dashboard; each page then reads
-            // the role internally to decide what's visible/editable.
             navigate('/dashboard', { replace: true });
             void user;
         } catch (err) {
@@ -72,7 +68,7 @@ export default function Login() {
 
             <section className="bg-white border border-slate-200/85 rounded-2xl w-full max-w-md p-6 sm:p-8 md:p-10 shadow-xl shadow-slate-900/5 transition-all relative overflow-hidden flex flex-col justify-between min-h-[560px]">
 
-                {/* Brand block */}
+
                 <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -96,7 +92,7 @@ export default function Login() {
                         </p>
                     </div>
 
-                    {/* Post-registration success banner */}
+
                     {justRegistered && !formError && (
                         <div className="mb-5 bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3">
                             <svg className="w-5 h-5 text-emerald-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -123,7 +119,7 @@ export default function Login() {
 
                     <form onSubmit={handleLoginSubmit} className="space-y-4">
 
-                        {/* Email */}
+
                         <div>
                             <label htmlFor="email-input" className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1.5">
                                 Corporate Email Address
@@ -148,7 +144,7 @@ export default function Login() {
                             </div>
                         </div>
 
-                        {/* Password */}
+
                         <div>
                             <label htmlFor="password-input" className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1.5">
                                 Password

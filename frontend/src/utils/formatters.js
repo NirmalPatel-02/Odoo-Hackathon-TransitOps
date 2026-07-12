@@ -1,5 +1,3 @@
-// Central formatting so every page renders numbers/dates the same way.
-// Currency defaults to INR to match the wireframe (Acq. Cost in Rs).
 
 export function formatCurrency(value, currency = "INR") {
   if (value === null || value === undefined || value === "") return "—";
@@ -26,7 +24,6 @@ export function formatDate(value) {
   }).format(date);
 }
 
-// For <input type="month"> fields comparing license/registration expiry.
 export function isPast(dateStr) {
   if (!dateStr) return false;
   return new Date(dateStr).getTime() < Date.now();

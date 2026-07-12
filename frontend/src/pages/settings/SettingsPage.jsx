@@ -89,20 +89,10 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* <div>
-          <label className="mb-1 block text-xs uppercase tracking-wide text-slate-500">Application Theme</label>
-          <select
-            className={fieldClasses}
-            value={settings.theme}
-            onChange={(e) => setSettings({ ...settings, theme: e.target.value })}
-          >
-            <option value="dark">Dark</option>
-            <option value="light">Light</option>
-          </select>
-        </div> */}
+
 
         <div className="flex items-center justify-between gap-3 border-t border-slate-800 pt-4">
-          {/* <p className="text-sm text-slate-500">{saved ? "Preferences saved." : `Current theme: ${theme}`}</p> */}
+
           <button type="submit" className="rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-slate-950 hover:bg-amber-500">
             Save Preferences
           </button>

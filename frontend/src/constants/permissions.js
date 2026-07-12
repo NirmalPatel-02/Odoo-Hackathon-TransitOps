@@ -1,8 +1,3 @@
-// Mirrors the functionality/role access table:
-// full        = create/edit/delete
-// view        = read-only
-// view-own    = read-only, scoped to the logged-in user's own record
-// none        = hidden entirely
 
 export const ROLES = {
   FLEET_MANAGER: "Fleet Manager",
@@ -54,7 +49,6 @@ export const PERMISSIONS = {
   },
 };
 
-// Returns 'full' | 'view' | 'view-own' | 'none'
 export function getAccess(role, resource) {
   return PERMISSIONS[role]?.[resource] || "none";
 }
