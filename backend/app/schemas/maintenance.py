@@ -1,27 +1,26 @@
 from pydantic import BaseModel, Field
+from decimal import Decimal
+from datetime import date
 from typing import Optional
-from datetime import datetime
+from app.models.maintenance import MaintenanceStatus
 
 class MaintenanceBase(BaseModel):
-    description: str = Field(..., min_length=5, max_length=255)
-    cost: Optional[float] = 0.0
+    vehicle_id: int
+    issue_description: str = Field(..., min_length=5)
+    start_date: date
 
 class MaintenanceCreate(MaintenanceBase):
-    vehicle_id: int
+    pass
 
-class MaintenanceUpdate(BaseModel):
-    description: Optional[str] = None
-    cost: Optional[float] = None
-    end_date: Optional[datetime] = None
-    status: Optional[str] = Field(None, pattern="^(In Progress|Completed)$")
+class MaintenanceClose(BaseModel):
+    cost: Decimal = Field(..., ge=0)
+    end_date: date
 
 class MaintenanceResponse(MaintenanceBase):
     id: int
-    vehicle_id: int
-    start_date: datetime
-    end_date: Optional[datetime] = None
-    status: str
-    vehicle_registration: Optional[str] = None
+    cost: Decimal
+    status: MaintenanceStatus
+    end_date: Optional[date] = None
 
     class Config:
         from_attributes = True

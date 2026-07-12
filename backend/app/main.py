@@ -26,6 +26,7 @@ app.include_router(trips.router, prefix="/api/v1/trips", tags=["Trip Management"
 app.include_router(fuel_expenses.router, prefix="/api/v1/expenses", tags=["Fuel & Expense Management"])
 app.include_router(reports.router, prefix="/api/v1/reports", tags=["Reports & Analytics"])
 app.include_router(maintenance.router, prefix="/api/v1/maintenance", tags=["Maintenance"])
+app.include_router(maintenance.router, prefix="/api/v1/maintenance", tags=["Maintenance Management"])
 
 @app.get("/")
 def health_check():
