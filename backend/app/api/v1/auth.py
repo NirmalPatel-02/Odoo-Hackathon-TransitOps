@@ -10,14 +10,11 @@ from app.schemas.user import UserCreate, UserResponse, Token
 
 router = APIRouter()
 
-# 1. PERFECT SIGNUP
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    # Check if email exists
     if db.query(User).filter(User.email == user_in.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # Find matching role row
     role = db.query(Role).filter(Role.name == user_in.role_name).first()
     if not role:
         raise HTTPException(status_code=400, detail=f"Role '{user_in.role_name}' does not exist.")
@@ -33,11 +30,9 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    # Attach role_name dynamically for the Pydantic parser
     new_user.role_name = role.name
     return new_user
 
-# 2. PERFECT LOGIN (Returns token + user profile info instantly)
 @router.post("/login", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == form_data.username).first()
@@ -49,7 +44,6 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
     access_token = create_access_token(data={"sub": user.email})
 
-    # Prepare the nested user object response structure
     user_info = UserResponse(
         id=user.id,
         email=user.email,
@@ -63,13 +57,12 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         "user": user_info
     }
 
-# 3. GET PROFILE VIA TOKEN
 @router.get("/me", response_model=UserResponse)
 def get_user_profile(current_user: User = Depends(get_current_user)):
     """
     Pass the Bearer token in the header.
     Returns the currently logged-in user's profile info.
     """
-    # Simply convert model details to match schema mapping
+
     current_user.role_name = current_user.role.name
     return current_user

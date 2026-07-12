@@ -1,7 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float, Enum
-from sqlalchemy.orm import relationship
-from ..core.database import Base
+from sqlalchemy import Column, Integer, String, Numeric, Enum
 import enum
+from app.core.database import Base
 
 class VehicleStatus(str, enum.Enum):
     AVAILABLE = "Available"
@@ -13,14 +12,15 @@ class Vehicle(Base):
     __tablename__ = "vehicles"
 
     id = Column(Integer, primary_key=True, index=True)
-    registration_number = Column(String(20), unique=True, nullable=False, index=True)
-    name = Column(String(100), nullable=False)
-    type = Column(String(50), nullable=False)
-    max_load_capacity = Column(Float, nullable=False)
-    odometer = Column(Integer, default=0)
-    acquisition_cost = Column(Float, nullable=False)
-    status = Column(Enum(VehicleStatus), default=VehicleStatus.AVAILABLE)
+    registration_number = Column(String(50), unique=True, index=True, nullable=False)
+    model = Column(String(255), nullable=False)
+    type = Column(String(100), nullable=False)
+    max_load_capacity = Column(Numeric(10, 2), nullable=False)
+    odometer = Column(Integer, default=0, nullable=False)
+    acquisition_cost = Column(Numeric(12, 2), nullable=False)
 
-    trips = relationship("Trip", back_populates="vehicle")
-    maintenance_logs = relationship("Maintenance", back_populates="vehicle")
-    fuel_logs = relationship("FuelLog", back_populates="vehicle")
+    status = Column(
+        Enum(VehicleStatus, values_callable=lambda obj: [e.value for e in obj]),
+        default=VehicleStatus.AVAILABLE,
+        nullable=False
+    )
