@@ -11,6 +11,7 @@ import TripManagementPage from '../pages/trips/TripManagementPage';
 import MaintenancePage from '../pages/maintenance/MaintenancePage';
 import FuelExpensePage from '../pages/expenses/FuelExpensePage';
 import AnalyticsPage from '../pages/analytics/AnalyticsPage';
+import SettingsPage from '../pages/settings/SettingsPage';
 
 // Each future page slots in the same way: add the import above, then a
 // <Route> below - wrapped in <ProtectedRoute resource="..."> if it should
@@ -49,11 +50,10 @@ export default function AppRoutes() {
           <Route element={<ProtectedRoute resource="analytics" />}>
             <Route path="/analytics" element={<AnalyticsPage />} />
           </Route>
-          {/*
+
           <Route element={<ProtectedRoute resource="settings" />}>
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
-          */}
         </Route>
       </Route>
 

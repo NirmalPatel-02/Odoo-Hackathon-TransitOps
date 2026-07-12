@@ -4,7 +4,7 @@
 
 export const NAV_ITEMS = [
   { label: "Dashboard", path: "/dashboard", resource: "dashboard" },
-  { label: "Fleet", path: "/fleet", resource: "vehicles" },
+  { label: "Vehicles", path: "/fleet", resource: "vehicles" },
   { label: "Drivers", path: "/drivers", resource: "drivers" },
   { label: "Trips", path: "/trips", resource: "trips" },
   { label: "Maintenance", path: "/maintenance", resource: "maintenance" },
