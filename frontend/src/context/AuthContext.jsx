@@ -1,30 +1,39 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { loginRequest, registerRequest } from "../api/endpoints/auth";
 import { AUTH_STORAGE_KEY } from "../api/axiosClient";
 
 const AuthContext = createContext(null);
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-  // True while we're checking sessionStorage on first load, so routes don't
-  // flash-redirect to /login before we've had a chance to read a saved session.
-  const [initializing, setInitializing] = useState(true);
+function readStoredSession() {
+  if (typeof window === "undefined") {
+    return { user: null, token: null };
+  }
 
-  useEffect(() => {
-    const raw = sessionStorage.getItem(AUTH_STORAGE_KEY);
-    if (raw) {
-      const saved = JSON.parse(raw);
-      setUser(saved.user);
-      setToken(saved.token);
-    }
-    setInitializing(false);
-  }, []);
+  try {
+    const raw = window.sessionStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return { user: null, token: null };
+
+    const saved = JSON.parse(raw);
+    return {
+      user: saved?.user ?? null,
+      token: saved?.token ?? null,
+    };
+  } catch {
+    window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
+    return { user: null, token: null };
+  }
+}
+
+export function AuthProvider({ children }) {
+  const savedSession = readStoredSession();
+  const [user, setUser] = useState(savedSession.user);
+  const [token, setToken] = useState(savedSession.token);
+  const initializing = false;
 
   const persist = (nextUser, nextToken) => {
     setUser(nextUser);
     setToken(nextToken);
-    sessionStorage.setItem(
+    window.sessionStorage.setItem(
       AUTH_STORAGE_KEY,
       JSON.stringify({ user: nextUser, token: nextToken })
     );
@@ -37,15 +46,14 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (payload) => {
-  const { data } = await registerRequest(payload);
-  return data;
-};
-
+    const { data } = await registerRequest(payload);
+    return data;
+  };
 
   const logout = () => {
     setUser(null);
     setToken(null);
-    sessionStorage.removeItem(AUTH_STORAGE_KEY);
+    window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
   };
 
   const value = {

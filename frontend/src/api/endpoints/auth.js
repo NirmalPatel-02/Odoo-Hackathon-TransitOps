@@ -1,18 +1,20 @@
 import axiosClient from "../axiosClient";
 
-// Matches the schema you shared:
-// POST /api/v1/auth/login -> { access_token, token_type, user: { id, name, email, role_name } }
-export const loginRequest = (email, password) =>
-  axiosClient.post("/api/v1/auth/login", { email, password });
+// FastAPI's auth endpoint expects form-encoded credentials for OAuth2 login.
+export const loginRequest = (email, password) => {
+  const formData = new URLSearchParams();
+  formData.append("username", email);
+  formData.append("password", password);
 
-// ASSUMPTION: no register endpoint schema was shared, so this follows the
-// same /api/v1/auth/* convention as login. Confirm the path and payload
-// shape against your FastAPI router (likely api/v1/routers/auth.py) and
-// adjust if it differs.
-export const registerRequest = ({ name, email, password, roleName }) =>
+  return axiosClient.post("/api/v1/auth/login", formData, {
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  });
+};
+
+export const registerRequest = ({ name, email, password, role_name }) =>
   axiosClient.post("/api/v1/auth/register", {
     name,
     email,
     password,
-    role_name: roleName,
+    role_name,
   });
