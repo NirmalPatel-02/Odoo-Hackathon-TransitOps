@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Numeric, Enum
 import enum
 from app.core.database import Base
+from sqlalchemy.orm import relationship
 
 class VehicleStatus(str, enum.Enum):
     AVAILABLE = "Available"
@@ -23,4 +24,10 @@ class Vehicle(Base):
         Enum(VehicleStatus, values_callable=lambda obj: [e.value for e in obj]),
         default=VehicleStatus.AVAILABLE,
         nullable=False
+    )
+
+    maintenance_logs = relationship(
+        "Maintenance",
+        back_populates="vehicle",
+        cascade="all, delete-orphan"
     )
